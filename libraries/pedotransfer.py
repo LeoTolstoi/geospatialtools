@@ -1,18 +1,35 @@
 import numpy as np
+import numpy.ma as ma
 
 
 def Lambda_Maidment92(phi, clay, sand):
 
+    if not (type(phi) == type(clay) == type(sand)):
+        raise TypeError("S, C, and OM must be of the same type "
+                        f"got {type(phi)}, {type(clay)}, {type(sand)}")
+
     # Maidment,1992
-    Lambda = np.exp(-0.7842831 + 0.0177544 * sand - 1.062498 * phi -
-                    0.00005304 * sand * sand - 0.00273493 * clay * clay +
-                    1.11134946 * phi * phi - 0.03088295 * sand * phi +
-                    0.00026587 * sand * sand * phi * phi -
-                    0.00610522 * clay * clay * phi * phi -
-                    0.00000235 * sand * sand * clay +
-                    0.00798746 * clay * clay * phi -
-                    0.00674491 * phi * phi * clay)
-    return Lambda
+    if type(phi) == ma.masked_array:
+        return ma.exp(-0.7842831 + 0.0177544 * sand - 1.062498 * phi -
+                      0.00005304 * sand * sand - 0.00273493 * clay * clay +
+                      1.11134946 * phi * phi - 0.03088295 * sand * phi +
+                      0.00026587 * sand * sand * phi * phi -
+                      0.00610522 * clay * clay * phi * phi -
+                      0.00000235 * sand * sand * clay +
+                      0.00798746 * clay * clay * phi -
+                      0.00674491 * phi * phi * clay)
+    elif type(phi) == np.ndarray:
+        return np.exp(-0.7842831 + 0.0177544 * sand - 1.062498 * phi -
+                      0.00005304 * sand * sand - 0.00273493 * clay * clay +
+                      1.11134946 * phi * phi - 0.03088295 * sand * phi +
+                      0.00026587 * sand * sand * phi * phi -
+                      0.00610522 * clay * clay * phi * phi -
+                      0.00000235 * sand * sand * clay +
+                      0.00798746 * clay * clay * phi -
+                      0.00674491 * phi * phi * clay)
+    else:
+        raise NotImplementedError(
+            "Only numpy arrays and masked arrays are supported")
 
 
 def Residual_Water_Content_Maidment92(phi, clay, sand):
@@ -27,18 +44,36 @@ def Residual_Water_Content_Maidment92(phi, clay, sand):
 
 def Bubbling_Pressure_Maidment92(phi, clay, sand):
 
+    if not (type(phi) == type(clay) == type(sand)):
+        raise TypeError("S, C, and OM must be of the same type "
+                        f"got {type(phi)}, {type(clay)}, {type(sand)}")
+
     # Maidment,1992
-    Psi = np.exp(5.3396738 + 0.1845038 * clay - 2.48394546 * phi -
-                 0.00213853 * clay * clay - 0.04356349 * sand * phi -
-                 0.61745089 * clay * phi +
-                 0.00143598 * sand * sand * phi * phi -
-                 0.00855375 * clay * clay * phi * phi -
-                 0.00001282 * sand * sand * clay +
-                 0.00895359 * clay * clay * phi -
-                 0.00072472 * sand * sand * phi +
-                 0.0000054 * clay * clay * sand +
-                 0.50028060 * phi * phi * clay)
-    return Psi
+    if type(phi) == ma.masked_array:
+        return ma.exp(5.3396738 + 0.1845038 * clay - 2.48394546 * phi -
+                      0.00213853 * clay * clay - 0.04356349 * sand * phi -
+                      0.61745089 * clay * phi +
+                      0.00143598 * sand * sand * phi * phi -
+                      0.00855375 * clay * clay * phi * phi -
+                      0.00001282 * sand * sand * clay +
+                      0.00895359 * clay * clay * phi -
+                      0.00072472 * sand * sand * phi +
+                      0.0000054 * clay * clay * sand +
+                      0.50028060 * phi * phi * clay)
+    elif type(phi) == np.ndarray:
+        return np.exp(5.3396738 + 0.1845038 * clay - 2.48394546 * phi -
+                      0.00213853 * clay * clay - 0.04356349 * sand * phi -
+                      0.61745089 * clay * phi +
+                      0.00143598 * sand * sand * phi * phi -
+                      0.00855375 * clay * clay * phi * phi -
+                      0.00001282 * sand * sand * clay +
+                      0.00895359 * clay * clay * phi -
+                      0.00072472 * sand * sand * phi +
+                      0.0000054 * clay * clay * sand +
+                      0.50028060 * phi * phi * clay)
+    else:
+        raise NotImplementedError(
+            "Only numpy arrays and masked arrays are supported")
 
 
 def Theta_1500t_Saxton2006(S, C, OM):
@@ -90,9 +125,22 @@ def ThetaS_Saxton2006(S, C, OM):
 
 def Lambda_Saxton_2006(S, C, OM):
 
+    if not (type(S) == type(C) == type(OM)):
+        raise TypeError("S, C, and OM must be of the same type "
+                        f"got {type(S)}, {type(C)}, {type(OM)}")
+
     Theta1500 = Theta_1500_Saxton2006(S, C, OM)
     Theta33 = Theta_33_Saxton2006(S, C, OM)
-    return (np.log(Theta33) - np.log(Theta1500)) / (np.log(1500) - np.log(33))
+
+    if type(S) == ma.masked_array:
+        return (ma.log(Theta33) - ma.log(Theta1500)) / (ma.log(1500) -
+                                                        ma.log(33))
+    elif type(S) == np.ndarray:
+        return (np.log(Theta33) - np.log(Theta1500)) / (np.log(1500) -
+                                                        np.log(33))
+    else:
+        raise NotImplementedError(
+            "Only numpy arrays and masked arrays are supported")
 
 
 def Ksat_Saxton2006(S, C, OM):
