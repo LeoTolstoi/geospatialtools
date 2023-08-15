@@ -1,53 +1,58 @@
 import grads
 import numpy as np
 import datetime
-ga = grads.GrADS(Bin='grads',Window=False,Echo=False)
 
-def extract_point_data(file,lats,lons,var,type):
+ga = grads.GrADS(Bin='grads', Window=False, Echo=False)
 
- #Open file
- ga("%s %s" % (type,file))
 
- #Extract data
- values = []
- for i in xrange(len(lons)):
-  ga("set lat %f" % lats[i])
-  ga("set lon %f" % lons[i])
-  values.append(np.array(ga.expr(var)))
+def extract_point_data(file, lats, lons, var, type):
 
- #Close file
- ga("close 1")
+    #Open file
+    ga("%s %s" % (type, file))
 
- return np.array(values)
+    #Extract data
+    values = []
+    for i in xrange(len(lons)):
+        ga("set lat %f" % lats[i])
+        ga("set lon %f" % lons[i])
+        values.append(np.array(ga.expr(var)))
+
+    #Close file
+    ga("close 1")
+
+    return np.array(values)
+
 
 def datetime2gradstime(date):
 
- #Convert datetime to grads time
- str = date.strftime('%HZ%d%b%Y')
+    #Convert datetime to grads time
+    str = date.strftime('%HZ%d%b%Y')
 
- return str
+    return str
+
 
 def gradstime2datetime(str):
 
- #Convert grads time to datetime
- date = datetime.datetime.strptime(str,'%HZ%d%b%Y')
+    #Convert grads time to datetime
+    date = datetime.datetime.strptime(str, '%HZ%d%b%Y')
 
- return date
+    return date
+
 
 def retrieve_metadata():
- 
- metadata = {}
 
- #Obtain the metadata
- metadata['nlat'] = ga.query('dims').ny
- metadata['nlon'] = ga.query('dims').nx
- metadata['minlat'] = ga.query('dims').lat[0]
- metadata['minlon'] = ga.query('dims').lon[0]
- metadata['maxlat'] = ga.query('dims').lat[1]
- metadata['maxlon'] = ga.query('dims').lon[1]
- vars = ga.query('file').vars
- tmp = ga.exp(vars[0])
- metadata['res'] = tmp.grid.lat[1] - tmp.grid.lat[0]
- metadata['undef'] = np.min(np.ma.getdata(tmp))
+    metadata = {}
 
- return metadata
+    #Obtain the metadata
+    metadata['nlat'] = ga.query('dims').ny
+    metadata['nlon'] = ga.query('dims').nx
+    metadata['minlat'] = ga.query('dims').lat[0]
+    metadata['minlon'] = ga.query('dims').lon[0]
+    metadata['maxlat'] = ga.query('dims').lat[1]
+    metadata['maxlon'] = ga.query('dims').lon[1]
+    vars = ga.query('file').vars
+    tmp = ga.exp(vars[0])
+    metadata['res'] = tmp.grid.lat[1] - tmp.grid.lat[0]
+    metadata['undef'] = np.min(np.ma.getdata(tmp))
+
+    return metadata
